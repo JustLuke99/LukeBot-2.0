@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 
@@ -23,55 +25,61 @@ class Core(commands.Cog):
     async def reload_plugin(self, ctx, plugin_name):
         if not Permissions.has_permission("plugin_manager", ctx.author.id):
             await ctx.respond(ErrMesagges.BAD_PERMISSIONS)
+            return
 
         try:
-            self.bot.reload_extension(f"plugins.{plugin_name}")
+            self.bot.reload_extension(f"plugins.{plugin_name}.{plugin_name}")
+            await asyncio.sleep(1)
+            await ctx.respond(f"Plugin ``{plugin_name}`` je obnoven!")
         except discord.ExtensionNotFound:
-            ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
         except discord.ExtensionNotLoaded:
-            ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
         except discord.ExtensionFailed:
-            ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
         except Exception as e:
-            ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})")
+            await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})")
 
-        await ctx.respond(f"Plugin ``{plugin_name}`` je obnoven!")
 
     # TODO dodělat choices
     @commands.slash_command(name="activate_plugin", description="Aktivuje zadaný plugin.")
     async def activate_plugin(self, ctx, plugin_name):
         if not Permissions.has_permission("plugin_manager", ctx.author.id):
             await ctx.send(ErrMesagges.BAD_PERMISSIONS)
+            return
 
         try:
-            self.bot.load_extension(f"plugins.{plugin_name}")
+            await self.bot.load_extension(f"plugins.{plugin_name}.{plugin_name}")
+            await asyncio.sleep(1)
+            await ctx.respond(f"Plugin ``{plugin_name}`` je aktivován!")
         except discord.ExtensionNotFound:
-            ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
         except discord.ExtensionAlreadyLoaded:
-            ctx.respond(f"Plugin ``{plugin_name}`` je již aktivován!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` je již aktivován!")
         except discord.ExtensionFailed:
-            ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
         except Exception as e:
-            ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})")
+            await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})")
 
-        await ctx.respond(f"Plugin ``{plugin_name}`` je aktivován!")
 
     # TODO dodělat choices
     @commands.slash_command(name="deactivate_plugin", description="Deaktivuje zadaný plugin.")
     async def deactivate_plugin(self, ctx, plugin_name):
         if not Permissions.has_permission("plugin_manager", ctx.author.id):
             await ctx.respond(ErrMesagges.BAD_PERMISSIONS)
+            return
 
         try:
-            self.bot.unload_extension(f"plugins.{plugin_name}")
+            self.bot.unload_extension(f"plugins.{plugin_name}.{plugin_name}")
+            await asyncio.sleep(1)
+            await ctx.respond(f"Plugin ``{plugin_name}`` je deaktivován!")
         except discord.ExtensionNotFound:
-            ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
         except discord.ExtensionNotLoaded:
-            ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
+            await ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
         except Exception as e:
-            ctx.respond(f"Plugin ``{plugin_name}`` nelze deaktivovat, obsahuje chybu! ({e})")
+            await ctx.respond(f"Plugin ``{plugin_name}`` nelze deaktivovat, obsahuje chybu! ({e})")
 
-        await ctx.respond(f"Plugin ``{plugin_name}`` je deaktivován!")
 
     @commands.slash_command(name="show_all_plugins", description="Zobrazí názvy všech pluginů.")
     async def show_all_plugins(self, ctx):
