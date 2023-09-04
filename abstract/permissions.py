@@ -14,9 +14,8 @@ class Permissions:
 class Roles:
     @staticmethod
     def is_girl(user_id: int) -> bool:
-        for role in ROLES["girls"]:
-            if user_id in ROLES[role]:
-                return True
+        if user_id in ROLES["girls"]:
+            return True
 
         return False
 

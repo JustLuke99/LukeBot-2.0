@@ -7,8 +7,8 @@ BAD_REDDIT_SITES = ["redgifs",
 REDDIT_DATA_LOADS = {
     "all": 800,
     "year": 150,
-    "month": 70,
-    "week": 50,
+    "month": 50,
+    "week": 30,
 }
 
 # TODO předělat do db verze

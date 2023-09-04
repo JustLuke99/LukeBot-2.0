@@ -47,7 +47,7 @@ class Reddit(commands.Cog):
         end_time = datetime.now() + timedelta(minutes=duration)
 
         while datetime.now() < end_time:
-            image = await self.get_image()
+            image = await get_image()
             await ctx.send(f"Reddit: {image.subreddit}\n{image.url}")
 
             await asyncio.sleep(15)
