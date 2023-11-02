@@ -1,11 +1,9 @@
-import asyncio
-
 import discord
 from discord.ext import commands
 
 from abstract.constants import ErrMesagges
 from abstract.permissions import Permissions
-from .constants import PLUGINS
+from .constants import PLUGINS, GUILDS
 
 __version__ = "2.0"
 
@@ -21,8 +19,7 @@ class Core(commands.Cog):
         print(f"Initializing core module (version {__version__})")
 
     async def sync_commands_after_action(self):
-        guild_ids = [695084202756014142, 648264007660077064]
-        await self.bot.sync_commands(guild_ids=guild_ids)
+        await self.bot.sync_commands(guild_ids=GUILDS)
 
     # TODO dodělat choices
     @commands.slash_command(name="reload_plugin", description="Přenačte zadaný plugin.")

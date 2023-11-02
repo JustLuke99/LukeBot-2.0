@@ -1,3 +1,4 @@
+# TODO change to DB
 ROLES = {
     "admin": [
         336903134859362314,
