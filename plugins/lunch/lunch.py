@@ -2,6 +2,7 @@ import asyncio
 import datetime
 import importlib
 import os
+import pytz
 from datetime import datetime, timedelta
 
 from abstract.cmds import *
@@ -21,13 +22,15 @@ class Lunch(commands.Cog):
         self.bg_task = self.bot.loop.create_task(self.auto_send_lunches())
 
     async def i_sleep_here(self):
-        now = datetime.now()
-        target_time = now.replace(hour=21, minute=50, second=0, microsecond=0)
+        now = datetime.now(pytz.timezone('Europe/Prague'))
+
+        target_time = now.replace(hour=10, minute=0, second=0, microsecond=0)
 
         if now > target_time:
             target_time += timedelta(days=1)
 
         delta = target_time - now
+
         await asyncio.sleep(delta.total_seconds())
 
     async def send_lunches(self, lunches):
@@ -46,9 +49,10 @@ class Lunch(commands.Cog):
 
     async def auto_send_lunches(self):
         await self.bot.wait_until_ready()
-        files = await self.get_files()
         while not self.bot.is_closed():
             await self.i_sleep_here()
+
+            files = await self.get_files()
 
             send_data = []
             for file in files:
@@ -63,9 +67,7 @@ class Lunch(commands.Cog):
                     lunch = parser_function()
                     lunch.insert(0, f"# {module_name} #")
                     send_data.append(lunch)
-
             await self.send_lunches(send_data)
-            await asyncio.sleep(30)
 
     def cog_unload(self):
         if self.bg_task:
