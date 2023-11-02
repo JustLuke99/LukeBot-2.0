@@ -20,6 +20,10 @@ class Core(commands.Cog):
         self.bot = bot
         print(f"Initializing core module (version {__version__})")
 
+    async def sync_commands_after_action(self):
+        guild_ids = [695084202756014142, 648264007660077064]
+        await self.bot.sync_commands(guild_ids=guild_ids)
+
     # TODO dodělat choices
     @commands.slash_command(name="reload_plugin", description="Přenačte zadaný plugin.")
     async def reload_plugin(self, ctx, plugin_name):
@@ -29,7 +33,6 @@ class Core(commands.Cog):
 
         try:
             self.bot.reload_extension(f"plugins.{plugin_name}.{plugin_name}")
-            await asyncio.sleep(1)
             await ctx.respond(f"Plugin ``{plugin_name}`` je obnoven!")
         except discord.ExtensionNotFound:
             await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
@@ -40,6 +43,9 @@ class Core(commands.Cog):
         except Exception as e:
             await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})")
 
+        await self.sync_commands_after_action()
+
+
 
     # TODO dodělat choices
     @commands.slash_command(name="activate_plugin", description="Aktivuje zadaný plugin.")
@@ -49,8 +55,7 @@ class Core(commands.Cog):
             return
 
         try:
-            await self.bot.load_extension(f"plugins.{plugin_name}.{plugin_name}")
-            await asyncio.sleep(1)
+            self.bot.load_extension(f"plugins.{plugin_name}.{plugin_name}")
             await ctx.respond(f"Plugin ``{plugin_name}`` je aktivován!")
         except discord.ExtensionNotFound:
             await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
@@ -60,6 +65,8 @@ class Core(commands.Cog):
             await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
         except Exception as e:
             await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})")
+        await self.sync_commands_after_action()
+
 
 
     # TODO dodělat choices
@@ -71,7 +78,6 @@ class Core(commands.Cog):
 
         try:
             self.bot.unload_extension(f"plugins.{plugin_name}.{plugin_name}")
-            await asyncio.sleep(1)
             await ctx.respond(f"Plugin ``{plugin_name}`` je deaktivován!")
         except discord.ExtensionNotFound:
             await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
@@ -79,6 +85,8 @@ class Core(commands.Cog):
             await ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
         except Exception as e:
             await ctx.respond(f"Plugin ``{plugin_name}`` nelze deaktivovat, obsahuje chybu! ({e})")
+        await self.sync_commands_after_action()
+
 
 
     @commands.slash_command(name="show_all_plugins", description="Zobrazí názvy všech pluginů.")

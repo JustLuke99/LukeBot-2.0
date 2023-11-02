@@ -73,4 +73,6 @@ class Reddit(commands.Cog):
             return
 
         # self.stop_reddit.append(ctx.channel.id)
+        await del_command(ctx.channel.id, __name__)
         await ctx.respond("Cecíky zastaveny")
+

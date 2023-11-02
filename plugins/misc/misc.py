@@ -3,6 +3,7 @@ import random
 
 import discord
 from discord.ext import commands
+from abstract.cmds import *
 
 from abstract.constants import ErrMesagges
 from abstract.permissions import Roles, Permissions
@@ -80,7 +81,11 @@ class Misc(commands.Cog):
 
     @commands.slash_command(name="hug", description="Hugni kamaráda.")
     async def hug(self, ctx, member: discord.Member):
-        await ctx.respond(f"<:peepoHug:665605303437492224> {member} <:loveheart:648286429104832532>")
+        await ctx.respond(f"<:peepoHug:665605303437492224> {member.mention} <:loveheart:648286429104832532>")
+
+    # @commands.slash_command(name="hug", description="Hugni kamaráda.")
+    # async def hug2(self, ctx, member: discord.Member):
+    #     await ctx.respond(f"<:peepoHug:665605303437492224> {member} <:loveheart:648286429104832532>")
 
     @commands.slash_command(name="msg", description="Tajná muška funkce :)")
     async def msg(self, ctx, *args):
@@ -106,6 +111,11 @@ class Misc(commands.Cog):
     # TODO refactor this
     @commands.slash_command(name="count_messages", description="Spočítání zpráv.")
     async def message_counter(self, ctx, arg1=None, arg2=None):
+        try:
+            await add_command(ctx.channel.id, __name__)
+        except commands.BadArgument as e:
+            await ctx.respond(f"{e}")
+            return
         start = datetime.utcnow()
         await ctx.respond("Začínám počítat zprávy, tohle bude chvilku trvat <:ocesSuck:653579725012467742>")
         just_test = []
@@ -184,6 +194,7 @@ class Misc(commands.Cog):
         else:
             await ctx.send(
                 f"```{send_help[0]}\n\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```")
+        await del_command(ctx.channel.id, __name__)
         return
 
     # TODO dodělat

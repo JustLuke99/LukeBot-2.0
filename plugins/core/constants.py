@@ -3,4 +3,5 @@ PLUGINS = [
     "reddit",
     "misc",
     "responses",
+    "lunch",
 ]
