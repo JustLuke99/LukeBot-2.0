@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from discord.ext import commands
 
 from data.models import RunningCommand
-from .constants import PLUGIN_DIRECTORY
+from constants import PLUGIN_DIRECTORY
 
 
 def check_if_cmd_is_running(room_id: int, command_name: str):

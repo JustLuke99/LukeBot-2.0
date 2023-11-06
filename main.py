@@ -14,7 +14,7 @@ application = get_wsgi_application()
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="/", intents=intents)
 
-# TODO začít používat
+# TODO use it
 logging.basicConfig(
     level=logging.WARNING,
     format="%(asctime)s %(levelname)s %(message)s",
