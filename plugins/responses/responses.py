@@ -14,7 +14,6 @@ def setup(bot):
 
 
 class TextResponse(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         for i in ZKRATKY:
@@ -26,10 +25,13 @@ class TextResponse(commands.Cog):
     async def on_message(self, message):
         if ZKRATKY["badbot"]["reg"].search(message.content):
             await message.channel.send(
-                "Drž piču zmrde <:reee:681088040797732868> Snažím se ze všech sil <:sadcat:648293902587002929>")
+                "Drž piču zmrde <:reee:681088040797732868> Snažím se ze všech sil <:sadcat:648293902587002929>"
+            )
         if message.author.bot:
             if ZKRATKY["stop"]["reg"].search(message.content):
-                await message.channel.send("Sbohem kamaráde <:peeporain:648282034468290571> ")
+                await message.channel.send(
+                    "Sbohem kamaráde <:peeporain:648282034468290571> "
+                )
             # elif zkratky["off"]["reg"].search(message.content) != None:
             #    await message.channel.send("Na tohle nemám.... du off... ")
             #    exit()
@@ -41,7 +43,9 @@ class TextResponse(commands.Cog):
             elif ZKRATKY["gm"]["reg"].search(message.content):
                 if delay_check("gm"):
                     return
-                await message.channel.send("Dobré ránko <:loveheart:648286429104832532>")
+                await message.channel.send(
+                    "Dobré ránko <:loveheart:648286429104832532>"
+                )
             elif ZKRATKY["purkyne"]["reg"].search(message.content):
                 if delay_check("purkyne"):
                     return
@@ -49,7 +53,9 @@ class TextResponse(commands.Cog):
             elif ZKRATKY["eo"]["reg"].search(message.content):
                 if delay_check("eo"):
                     return
-                await message.channel.send("<:pepega:648282034245992448> :mega: Eeeeeeeeeo")
+                await message.channel.send(
+                    "<:pepega:648282034245992448> :mega: Eeeeeeeeeo"
+                )
             elif ZKRATKY["ruby"]["reg"].search(message.content):
                 if delay_check("ruby"):
                     return
@@ -75,7 +81,8 @@ class TextResponse(commands.Cog):
                     return
                 await message.add_reaction("<:PogChamp:691295767993909291>")
                 await message.channel.send(
-                    "Čmuchám čmuchám dobrotu <:peepowow:648296420951982100> Nalijte rundu, já a můj majitel jsme již na cestě.")
+                    "Čmuchám čmuchám dobrotu <:peepowow:648296420951982100> Nalijte rundu, já a můj majitel jsme již na cestě."
+                )
             # elif ZKRATKY["kachna"]["reg"].search(message.content):
             #     await message.add_reaction("🦆")
             #     if delay_check("kachna"):
@@ -86,7 +93,9 @@ class TextResponse(commands.Cog):
                 if delay_check("flex"):
                     return
                 # await message.channel.send("Mr. flex osobně? <:PogChamp:691295767993909291> Můžu poprosit podpis? <:peepowow:648296420951982100>")
-                await message.channel.send("Divný flex, ale ok <:kekw:655402255138422799>")
+                await message.channel.send(
+                    "Divný flex, ale ok <:kekw:655402255138422799>"
+                )
             # elif ZKRATKY["černoch"]["reg"].search(message.content):
             #     if delay_check("černoch"):
             #         return
@@ -105,12 +114,15 @@ class TextResponse(commands.Cog):
             elif ZKRATKY["stopemote"]["reg"].search(message.content):
                 if delay_check("stopemote"):
                     return
-                await message.channel.send("https://media.giphy.com/media/NMHpkm0MPar2U/giphy.gif")
+                await message.channel.send(
+                    "https://media.giphy.com/media/NMHpkm0MPar2U/giphy.gif"
+                )
             elif ZKRATKY["okBot"]["reg"].search(message.content):
                 if delay_check("okBot"):
                     return
                 await message.channel.send(
-                    "Omlouvám se za malé nedopatření... Chyba bude nahlášena a opravena <:peepowow:648296420951982100>")
+                    "Omlouvám se za malé nedopatření... Chyba bude nahlášena a opravena <:peepowow:648296420951982100>"
+                )
             elif ZKRATKY["fuchs"]["reg"].search(message.content):
                 if delay_check("fuchs"):
                     return

@@ -5,15 +5,18 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data', '0008_redditimage_date_created_redditimage_last_sent'),
+        ("data", "0008_redditimage_date_created_redditimage_last_sent"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='redditimage',
-            name='date_created',
-            field=models.DateTimeField(default=datetime.datetime(2023, 9, 2, 11, 22, 5, 119318, tzinfo=datetime.timezone.utc)),
+            model_name="redditimage",
+            name="date_created",
+            field=models.DateTimeField(
+                default=datetime.datetime(
+                    2023, 9, 2, 11, 22, 5, 119318, tzinfo=datetime.timezone.utc
+                )
+            ),
         ),
     ]

@@ -4,26 +4,33 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data', '0006_delete_user'),
+        ("data", "0006_delete_user"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='RunningCommand',
+            name="RunningCommand",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('room_id', models.IntegerField()),
-                ('command_name', models.CharField(max_length=255)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("room_id", models.IntegerField()),
+                ("command_name", models.CharField(max_length=255)),
             ],
         ),
         migrations.RemoveField(
-            model_name='redditimage',
-            name='date_created',
+            model_name="redditimage",
+            name="date_created",
         ),
         migrations.RemoveField(
-            model_name='redditimage',
-            name='last_sent',
+            model_name="redditimage",
+            name="last_sent",
         ),
     ]

@@ -1,16 +1,19 @@
+import datetime
+from typing import List
+
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from bs4 import BeautifulSoup
-from typing import List, Dict
+from selenium.webdriver.support.ui import WebDriverWait
+
 
 def orel_parser() -> List[str]:
     driver = webdriver.Chrome()
-    driver.get('https://www.drevenyorel.cz/cz/page/tydenni-menu')
+    driver.get("https://www.drevenyorel.cz/cz/page/tydenni-menu")
 
     wait = WebDriverWait(driver, 10)
-    iframe = wait.until(EC.presence_of_element_located((By.TAG_NAME, 'iframe')))
+    iframe = wait.until(EC.presence_of_element_located((By.TAG_NAME, "iframe")))
 
     driver.switch_to.frame(iframe)
 
@@ -19,12 +22,29 @@ def orel_parser() -> List[str]:
     driver.quit()
 
     soup = BeautifulSoup(iframe_content, "html.parser")
-    menu_items = soup.find_all('div', class_='inner-layer item')
 
-    menu = []
+    menu_items = []
+    current_date = None
+
+    for div in soup.find_all("div"):
+        if "date inner-layer" in " ".join(div.get("class", "")):
+            current_date = div.text.strip()
+
+        if "inner-layer item" in " ".join(div.get("class", "")):
+            menu_item = {
+                "date": current_date,
+                "name": div.find("div", {"class": "item-name"}).text.strip(),
+                "description": div.find(
+                    "div", {"class": "item-description"}
+                ).text.strip(),
+                "price": div.find("div", {"class": "item-price-down"}).text.strip(),
+            }
+            menu_items.append(menu_item)
+
+    today_menu = []
+    today_day = datetime.datetime.now().strftime("%A")
     for item in menu_items:
-        name = item.find('div', class_='item-name').get_text(strip=True)
-        price = item.find('div', class_='item-price-down').get_text(strip=True)
-        menu.append(f"{name} {price}")
+        if today_day in item["date"]:
+            today_menu.append(f"{item['name']} {item['price']}")
 
-    return menu
+    return today_menu

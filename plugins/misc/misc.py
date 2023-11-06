@@ -17,7 +17,6 @@ def setup(bot):
 
 
 class Misc(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
         self.bot_start = datetime.utcnow()
@@ -37,24 +36,33 @@ class Misc(commands.Cog):
     @commands.slash_command(name="sexymetr", description="Vypočítá jak jsi sexy.")
     async def sexymetr(self, ctx, member: discord.Member = None):
         if member:
-            await ctx.respond(f"{member} je sexy na {round(random.uniform(0, 102), 1)}%")
+            await ctx.respond(
+                f"{member} je sexy na {round(random.uniform(0, 102), 1)}%"
+            )
         else:
             await ctx.respond(f"Jsi sexy na {round(random.uniform(0, 102), 1)}%")
 
-    @commands.slash_command(name="gay_calculator", description="Vypočítá jak moc si homo.")
+    @commands.slash_command(
+        name="gay_calculator", description="Vypočítá jak moc si homo."
+    )
     async def gay_calculator(self, ctx, member: discord.Member = None):
         if member:
             await ctx.respond(f"{member} je gay na {round(random.uniform(0, 100), 1)}%")
         else:
             await ctx.respond(f"jsi gay na {round(random.uniform(0, 100), 1)}%")
 
-    @commands.slash_command(name="dnessex", description="Řekne ti, zda budeš dnes mít sex.")
+    @commands.slash_command(
+        name="dnessex", description="Řekne ti, zda budeš dnes mít sex."
+    )
     async def dnessex(self, ctx):
         if round(random.uniform(0, 35), 0):
-            await ctx.respond(f"Dnes bohužel nebudeš mít sex <:sadcat:648293902587002929>")
+            await ctx.respond(
+                f"Dnes bohužel nebudeš mít sex <:sadcat:648293902587002929>"
+            )
         else:
             await ctx.respond(
-                f"Dnes budeš mít sex <:PogChamp:691295767993909291> Užij si to <:Kubaez:648295679499698176>")
+                f"Dnes budeš mít sex <:PogChamp:691295767993909291> Užij si to <:Kubaez:648295679499698176>"
+            )
 
     @commands.slash_command(name="penis", description="Změří ti délku penisu.")
     async def penis(self, ctx):
@@ -81,7 +89,9 @@ class Misc(commands.Cog):
 
     @commands.slash_command(name="hug", description="Hugni kamaráda.")
     async def hug(self, ctx, member: discord.Member):
-        await ctx.respond(f"<:peepoHug:665605303437492224> {member.mention} <:loveheart:648286429104832532>")
+        await ctx.respond(
+            f"<:peepoHug:665605303437492224> {member.mention} <:loveheart:648286429104832532>"
+        )
 
     # @commands.slash_command(name="hug", description="Hugni kamaráda.")
     # async def hug2(self, ctx, member: discord.Member):
@@ -98,14 +108,17 @@ class Misc(commands.Cog):
     async def off(self, ctx):
         if not Permissions.has_permission("turn_off", ctx.author.id):
             await ctx.respond(
-                ErrMesagges.BAD_PERMISSIONS + f" Abych já nevypl tebe <:jebeToCoSiDalPrave:691704864488816660>")
+                ErrMesagges.BAD_PERMISSIONS
+                + f" Abych já nevypl tebe <:jebeToCoSiDalPrave:691704864488816660>"
+            )
             return
 
         await ctx.respond(
             f"Odjíždím na dovolenou, mějte se tu hezky.  Ahóóój <:loveheart:648286429104832532>```"
             f"Čas zapnutí: {str((self.bot_start)).rsplit('.')[0]} \n"
             f"Čas vypnutí: {str((datetime.utcnow())).rsplit('.')[0]} \n"
-            f"Celková doba zapnutí: {str((datetime.utcnow() - self.bot_start)).rsplit('.')[0]}```")
+            f"Celková doba zapnutí: {str((datetime.utcnow() - self.bot_start)).rsplit('.')[0]}```"
+        )
         exit()
 
     # TODO refactor this
@@ -117,7 +130,9 @@ class Misc(commands.Cog):
             await ctx.respond(f"{e}")
             return
         start = datetime.utcnow()
-        await ctx.respond("Začínám počítat zprávy, tohle bude chvilku trvat <:ocesSuck:653579725012467742>")
+        await ctx.respond(
+            "Začínám počítat zprávy, tohle bude chvilku trvat <:ocesSuck:653579725012467742>"
+        )
         just_test = []
         send = ""
         send_help = ""
@@ -127,7 +142,9 @@ class Misc(commands.Cog):
             m, _ = divmod(num_of_ch * 120, 60)
             h, m = divmod(m, 60)
             try:
-                message = await ctx.send(f"```Očekávaná doba počítání je {h:d}h:{m:02d}m\nZatím je spočítáno 0%```")
+                message = await ctx.send(
+                    f"```Očekávaná doba počítání je {h:d}h:{m:02d}m\nZatím je spočítáno 0%```"
+                )
             except:
                 ...
             count_all = True
@@ -152,13 +169,19 @@ class Misc(commands.Cog):
                         messageCount_test[channel.name][msg.author.name] = 1
                     tmp += 1
                 just_test.append(
-                    {"channel": channel.name, "total_count": tmp, "user_count": messageCount_test[channel.name]})
+                    {
+                        "channel": channel.name,
+                        "total_count": tmp,
+                        "user_count": messageCount_test[channel.name],
+                    }
+                )
             edit_prcnt += 1
             m, _ = divmod((num_of_ch - edit_prcnt) * 120, 60)
             h, m = divmod(m, 60)
             try:
                 await message.edit(
-                    content=f"```Očekávaná doba počítání je {h:d}h:{m:02d}m\nZatím je spočítáno {round(edit_prcnt / num_of_ch * 100, 2)}%```")
+                    content=f"```Očekávaná doba počítání je {h:d}h:{m:02d}m\nZatím je spočítáno {round(edit_prcnt / num_of_ch * 100, 2)}%```"
+                )
             except:
                 ...
         total = dict()
@@ -185,15 +208,18 @@ class Misc(commands.Cog):
 
         if arg1 == "all+":
             await ctx.send(
-                f"```{send}\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```")
+                f"```{send}\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```"
+            )
             for i in range(len(send_help) - 1):
                 await ctx.send(f"```{send_help[i]}```")
         elif count_all:
             await ctx.send(
-                f"```{send}\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```")
+                f"```{send}\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```"
+            )
         else:
             await ctx.send(
-                f"```{send_help[0]}\n\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```")
+                f"```{send_help[0]}\n\nstart: {str((start)).rsplit('.')[0]} \nkonec: {str((datetime.utcnow())).rsplit('.')[0]}\nDoba počítání: {str((datetime.utcnow() - start)).rsplit('.')[0]}```"
+            )
         await del_command(ctx.channel.id, __name__)
         return
 
@@ -213,6 +239,10 @@ class Misc(commands.Cog):
                 min = int(args[0])
                 max = int(args[1])
 
-            await ctx.respond(f"Z intervalu {min} až {max} se vybralo číslo ``{random.randint(min, max)}``")
+            await ctx.respond(
+                f"Z intervalu {min} až {max} se vybralo číslo ``{random.randint(min, max)}``"
+            )
         else:
-            await ctx.respond(f"Z výběru {args} se vybrala možnost ``{random.choice(args)}``")
+            await ctx.respond(
+                f"Z výběru {args} se vybrala možnost ``{random.choice(args)}``"
+            )

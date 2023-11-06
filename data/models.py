@@ -19,7 +19,11 @@ class RedditImage(models.Model):
     url = models.CharField(max_length=255)
     subreddit = models.CharField(max_length=100)
     date_created = models.DateTimeField(default=timezone.now())
-    last_sent = models.DateTimeField(default=timezone.make_aware(datetime(2000, 1, 1), timezone.get_default_timezone()))
+    last_sent = models.DateTimeField(
+        default=timezone.make_aware(
+            datetime(2000, 1, 1), timezone.get_default_timezone()
+        )
+    )
 
     def __str__(self):
         return f"url: {self.url}, reddit: {self.subreddit}"

@@ -5,20 +5,27 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data', '0007_runningcommand_remove_redditimage_date_created_and_more'),
+        ("data", "0007_runningcommand_remove_redditimage_date_created_and_more"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='redditimage',
-            name='date_created',
-            field=models.DateTimeField(default=datetime.datetime(2023, 9, 2, 10, 44, 12, 676218, tzinfo=datetime.timezone.utc)),
+            model_name="redditimage",
+            name="date_created",
+            field=models.DateTimeField(
+                default=datetime.datetime(
+                    2023, 9, 2, 10, 44, 12, 676218, tzinfo=datetime.timezone.utc
+                )
+            ),
         ),
         migrations.AddField(
-            model_name='redditimage',
-            name='last_sent',
-            field=models.DateTimeField(default=datetime.datetime(2000, 1, 1, 6, 0, tzinfo=datetime.timezone.utc)),
+            model_name="redditimage",
+            name="last_sent",
+            field=models.DateTimeField(
+                default=datetime.datetime(
+                    2000, 1, 1, 6, 0, tzinfo=datetime.timezone.utc
+                )
+            ),
         ),
     ]

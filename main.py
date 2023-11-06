@@ -6,7 +6,6 @@ from decouple import config
 from discord.ext import commands
 from django.core.wsgi import get_wsgi_application
 
-from plugins.core.constants import PLUGINS
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
 
@@ -19,13 +18,15 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 logging.basicConfig(
     level=logging.WARNING,
     format="%(asctime)s %(levelname)s %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S"
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 logger = logging.getLogger(__name__)
 
 
 def load_plugins():
-    for plugin in PLUGINS:
+    from abstract.cmds import all_plugins
+
+    for plugin in all_plugins():
         bot.load_extension(f"plugins.{plugin}.{plugin}")
 
 
@@ -34,7 +35,11 @@ async def on_ready():
     load_plugins()
 
     print("Syncing commands.")
-    await bot.sync_commands(guild_ids=[int(x) for x in os.getenv("DISCORD_SERVER_IDS").replace(" ", "").split(",")])
+    await bot.sync_commands(
+        guild_ids=[
+            int(x) for x in config("DISCORD_SERVER_IDS").replace(" ", "").split(",")
+        ]
+    )
     print("Commands synced.")
 
     print("Bot je ready!")

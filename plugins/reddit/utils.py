@@ -9,8 +9,12 @@ from decouple import config
 from data.models import *
 from .constants import SUBREDDITS, REDDIT_DATA_LOADS, BAD_REDDIT_SITES
 
-reddit = praw.Reddit(client_id='S7bh82OEvGc70A', client_secret=config("REDDIT_SECRET"),
-                     user_agent='DiscordBot', check_for_async=False)
+reddit = praw.Reddit(
+    client_id="S7bh82OEvGc70A",
+    client_secret=config("REDDIT_SECRET"),
+    user_agent="DiscordBot",
+    check_for_async=False,
+)
 
 
 @database_sync_to_async
@@ -61,7 +65,7 @@ def del_image_if_not_found(image: RedditImage) -> bool:
 @database_sync_to_async
 def get_image() -> RedditImage:
     while True:
-        image = RedditImage.objects.order_by('?').first()
+        image = RedditImage.objects.order_by("?").first()
         if image.last_sent < (timezone.now() - timedelta(days=1)):
             deleted = del_image_if_not_found(image)
             if not deleted:

@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 
 def knoflik_parser() -> List[Dict]:
-    url = 'http://brnorestaurace.cz/tydenni-menu/'
+    url = "http://brnorestaurace.cz/tydenni-menu/"
 
     response = requests.get(url)
 

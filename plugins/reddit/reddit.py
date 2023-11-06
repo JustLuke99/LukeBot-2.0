@@ -28,14 +28,20 @@ class DurationConverter(Converter):
 class Reddit(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.reddit = praw.Reddit(client_id=config("REDDIT_CLIENT"), client_secret=config("REDDIT_SECRET"),
-                                  user_agent='DiscordBot', check_for_async=False)
+        self.reddit = praw.Reddit(
+            client_id=config("REDDIT_CLIENT"),
+            client_secret=config("REDDIT_SECRET"),
+            user_agent="DiscordBot",
+            check_for_async=False,
+        )
 
         asyncio.ensure_future(del_all_commands())
         asyncio.ensure_future(check_reddit_images())
         print(f"Initializing reddit module (version {__version__})")
 
-    @commands.slash_command(name="reddit_auto", description="Automatické posílání cecíků.")
+    @commands.slash_command(
+        name="reddit_auto", description="Automatické posílání cecíků."
+    )
     async def reddit_auto(self, ctx, duration: DurationConverter):
         try:
             await add_command(ctx.channel.id, __name__)
@@ -57,7 +63,9 @@ class Reddit(commands.Cog):
         # TODO dodělat
         await msg.add_reaction("🔃")
 
-    @commands.slash_command(name="delete_all_photos", description="Smaže všechny obrázky z databáze.")
+    @commands.slash_command(
+        name="delete_all_photos", description="Smaže všechny obrázky z databáze."
+    )
     async def delete_all_photos(self, ctx):
         if not Roles.has_role("admin", ctx.author.id):
             await ctx.send(ErrMesagges.BAD_PERMISSIONS)
@@ -66,7 +74,9 @@ class Reddit(commands.Cog):
         await ctx.respond("Databáze smazána")
 
     # TODO dodělat, nefunkční
-    @commands.slash_command(name="stop_auto_reddit", description="Zastaví posílání cecíků")
+    @commands.slash_command(
+        name="stop_auto_reddit", description="Zastaví posílání cecíků"
+    )
     async def stop_auto_reddit(self, ctx):
         if not await cmd_running(ctx.channel.id, __name__):
             await ctx.respond("Žádné cecíky tu nevidím")
@@ -75,4 +85,3 @@ class Reddit(commands.Cog):
         # self.stop_reddit.append(ctx.channel.id)
         await del_command(ctx.channel.id, __name__)
         await ctx.respond("Cecíky zastaveny")
-

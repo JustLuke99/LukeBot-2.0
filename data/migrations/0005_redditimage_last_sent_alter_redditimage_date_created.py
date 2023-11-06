@@ -7,20 +7,21 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('data', '0004_alter_redditimage_id_alter_user_id'),
+        ("data", "0004_alter_redditimage_id_alter_user_id"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='redditimage',
-            name='last_sent',
-            field=models.DateTimeField(default=dt(2000, 1, 1, 6, 0, tzinfo=datetime.timezone.utc)),
+            model_name="redditimage",
+            name="last_sent",
+            field=models.DateTimeField(
+                default=dt(2000, 1, 1, 6, 0, tzinfo=datetime.timezone.utc)
+            ),
         ),
         migrations.AlterField(
-            model_name='redditimage',
-            name='date_created',
+            model_name="redditimage",
+            name="date_created",
             field=models.DateTimeField(default=django.utils.timezone.now),
         ),
     ]

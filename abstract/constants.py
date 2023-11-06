@@ -12,15 +12,23 @@ ROLES = {
         480107461215256576,
         471778363007172608,
         424702755299655690,
-    ]
+    ],
 }
 
 PERMISSIONS = {
-    "plugin_manager": ["admin", ],
-    "send_messages": ["admin", ],
-    "turn_off": ["admin", ],
+    "plugin_manager": [
+        "admin",
+    ],
+    "send_messages": [
+        "admin",
+    ],
+    "turn_off": [
+        "admin",
+    ],
 }
 
+PLUGIN_DIRECTORY = "plugins"
 
-class ErrMesagges():
+
+class ErrMesagges:
     BAD_PERMISSIONS = "Na tuhle funkci nemáš oprávnění."

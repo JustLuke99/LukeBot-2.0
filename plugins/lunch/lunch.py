@@ -2,13 +2,14 @@ import asyncio
 import datetime
 import importlib
 import os
+import time
 from datetime import datetime, timedelta
 
 import pytz
 from decouple import config
 
 from abstract.cmds import *
-from .constants import PARSER_DIRECTORY, DISCORD_ROOMS
+from .constants import PARSER_DIRECTORY
 
 __version__ = "1.0"
 
@@ -20,14 +21,18 @@ def setup(bot):
 class Lunch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.lunch_rooms = [int(x) for x in config("LUNCH_ROOMS").replace(" ", "").split(",")]
-        print(f"Initializing lunch module (version {__version__})")
+        self.lunch_rooms = [
+            x for x in config("LUNCH_ROOMS").replace(" ", "").split(",")
+        ]
+
         self.bg_task = self.bot.loop.create_task(self.auto_send_lunches())
 
-    async def i_sleep_here(self):
-        now = datetime.now(pytz.timezone('Europe/Prague'))
+        print(f"Initializing lunch module (version {__version__})")
 
-        target_time = now.replace(hour=10, minute=0, second=0, microsecond=0)
+    async def i_sleep_here(self):
+        now = datetime.now(pytz.timezone("Europe/Prague"))
+
+        target_time = now.replace(hour=10, minute=10, second=0, microsecond=0)
 
         if now > target_time:
             target_time += timedelta(days=1)
@@ -38,10 +43,11 @@ class Lunch(commands.Cog):
 
     async def send_lunches(self, lunches):
         for room in self.lunch_rooms:
-            channel = self.bot.get_channel(room)
-            # await channel.purge(limit=100)
+            channel = self.bot.get_channel(int(room))
+            await channel.purge(limit=100)
             for lunch in lunches:
-                await channel.send('\n'.join(lunch))
+                await channel.send("\n".join(lunch))
+                time.sleep(0.2)
 
     @staticmethod
     async def get_files():
@@ -52,24 +58,32 @@ class Lunch(commands.Cog):
 
     async def auto_send_lunches(self):
         await self.bot.wait_until_ready()
+
         while not self.bot.is_closed():
-            await self.i_sleep_here()
+            # await self.i_sleep_here()
 
             files = await self.get_files()
 
             send_data = []
             for file in files:
-                if not file.endswith(".py"):
+                if not file.endswith(".py") or "__" in file:
                     continue
 
                 module_name = file[:-3]
-                module = importlib.import_module(f'plugins.lunch.{PARSER_DIRECTORY}.{module_name}')
+                module = importlib.import_module(
+                    f"plugins.lunch.{PARSER_DIRECTORY}.{module_name}"
+                )
 
-                parser_function = getattr(module, f'{module_name}_parser', None)
+                parser_function = getattr(module, f"{module_name}_parser", None)
+
                 if parser_function:
-                    lunch = parser_function()
+                    try:
+                        lunch = parser_function()
+                    except:
+                        lunch = ["Obědy se nepodařilo rozparsovat"]
                     lunch.insert(0, f"# {module_name} #")
                     send_data.append(lunch)
+
             await self.send_lunches(send_data)
 
     def cog_unload(self):
