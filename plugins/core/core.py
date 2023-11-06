@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from decouple import config
 from abstract.constants import ErrMesagges
 from abstract.permissions import Permissions
 from .constants import PLUGINS, GUILDS
@@ -16,10 +17,12 @@ class Core(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+
+        self.server_guilds = [int(x) for x in config("DISCORD_SERVER_IDS").replace(" ", "").split(",")]
         print(f"Initializing core module (version {__version__})")
 
     async def sync_commands_after_action(self):
-        await self.bot.sync_commands(guild_ids=GUILDS)
+        await self.bot.sync_commands(guild_ids=self.server_guilds)
 
     # TODO dodělat choices
     @commands.slash_command(name="reload_plugin", description="Přenačte zadaný plugin.")

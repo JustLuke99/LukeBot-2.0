@@ -34,7 +34,7 @@ async def on_ready():
     load_plugins()
 
     print("Syncing commands.")
-    await bot.sync_commands(guild_ids=[695084202756014142, 648264007660077064])
+    await bot.sync_commands(guild_ids=[int(x) for x in os.getenv("DISCORD_SERVER_IDS").replace(" ", "").split(",")])
     print("Commands synced.")
 
     print("Bot je ready!")

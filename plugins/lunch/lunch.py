@@ -2,8 +2,10 @@ import asyncio
 import datetime
 import importlib
 import os
-import pytz
 from datetime import datetime, timedelta
+
+import pytz
+from decouple import config
 
 from abstract.cmds import *
 from .constants import PARSER_DIRECTORY, DISCORD_ROOMS
@@ -18,6 +20,7 @@ def setup(bot):
 class Lunch(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.lunch_rooms = [int(x) for x in config("LUNCH_ROOMS").replace(" ", "").split(",")]
         print(f"Initializing lunch module (version {__version__})")
         self.bg_task = self.bot.loop.create_task(self.auto_send_lunches())
 
@@ -34,7 +37,7 @@ class Lunch(commands.Cog):
         await asyncio.sleep(delta.total_seconds())
 
     async def send_lunches(self, lunches):
-        for room in DISCORD_ROOMS:
+        for room in self.lunch_rooms:
             channel = self.bot.get_channel(room)
             # await channel.purge(limit=100)
             for lunch in lunches:
