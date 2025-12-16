@@ -1,102 +1,228 @@
+import logging
+from typing import List
+
 import discord
 from decouple import config
+from discord import app_commands
 from discord.ext import commands
 
 from abstract.constants import ErrMesagges
 from abstract.permissions import Permissions
 from abstract.cmds import all_plugins
 
+logger = logging.getLogger(__name__)
 
-__version__ = "2.0"
+__version__ = "2.6.4"
 
 
-def setup(bot):
-    bot.add_cog(Core(bot))
+async def setup(bot: commands.Bot) -> None:
+    await bot.add_cog(Core(bot))
 
 
 class Core(commands.Cog):
-    def __init__(self, bot):
+    """Core management commands for the bot, handling plugin lifecycle."""
+
+    def __init__(self, bot: commands.Bot) -> None:
+        """Initializes the Core cog.
+
+        Args:
+            bot (commands.Bot): The bot instance.
+        """
         self.bot = bot
-
+        # Parsing guild IDs for targeted synchronization
         self.server_guilds = [
-            int(x) for x in config("DISCORD_SERVER_IDS").replace(" ", "").split(",")
+            discord.Object(id=int(x))
+            for x in config("DISCORD_SERVER_IDS", default="").replace(" ", "").split(",")
+            if x
         ]
-        print(f"Initializing core module (version {__version__})")
+        logger.info(f"Initializing core module (version {__version__})")
 
-    async def sync_commands_after_action(self):
-        await self.bot.sync_commands(guild_ids=self.server_guilds)
+    async def _sync_commands(self) -> None:
+        """Synchronizes commands with the configured guilds.
 
-    # TODO dodělat choices
-    @commands.slash_command(name="reload_plugin", description="Přenačte zadaný plugin.")
-    async def reload_plugin(self, ctx, plugin_name):
-        if not Permissions.has_permission("plugin_manager", ctx.author.id):
-            await ctx.respond(ErrMesagges.BAD_PERMISSIONS)
+        This ensures that any changes to commands (loading/unloading plugins)
+        are reflected in the Discord client immediately.
+        """
+        if not self.server_guilds:
+            logger.warning("No guild IDs configured. Syncing globally.")
+            await self.bot.tree.sync()
             return
 
+        for guild_obj in self.server_guilds:
+            try:
+                # Copy global commands to the specific guild to ensure they update immediately
+                self.bot.tree.copy_global_to(guild=guild_obj)
+                await self.bot.tree.sync(guild=guild_obj)
+                logger.info(f"Synced commands to guild {guild_obj.id}")
+            except discord.HTTPException as e:
+                logger.error(f"Failed to sync guild {guild_obj.id}: {e}")
+
+    async def plugin_autocomplete(
+        self, interaction: discord.Interaction, current: str
+    ) -> List[app_commands.Choice[str]]:
+        """Autocompletion function for plugin names.
+
+        Args:
+            interaction (discord.Interaction): The interaction context.
+            current (str): The current user input.
+
+        Returns:
+            List[app_commands.Choice[str]]: A list of matching plugin names.
+        """
+        plugins = all_plugins()
+        return [
+            app_commands.Choice(name=plugin, value=plugin)
+            for plugin in plugins
+            if current.lower() in plugin.lower()
+        ][:25]  # Discord limits choices to 25
+
+    @app_commands.command(
+        name="reload_plugin", description="Reloads a specified plugin."
+    )
+    @app_commands.autocomplete(plugin_name=plugin_autocomplete)
+    async def reload_plugin(
+        self, interaction: discord.Interaction, plugin_name: str
+    ) -> None:
+        """Reloads a bot extension (plugin).
+
+        Args:
+            interaction (discord.Interaction): The interaction object.
+            plugin_name (str): The name of the plugin to reload.
+        """
+        if not Permissions.has_permission("plugin_manager", interaction.user.id):
+            await interaction.response.send_message(
+                ErrMesagges.BAD_PERMISSIONS, ephemeral=True
+            )
+            return
+
+        # Deferring because reloading and syncing can take time
+        await interaction.response.defer()
+
         try:
-            self.bot.reload_extension(f"plugins.{plugin_name}.{plugin_name}")
-            await ctx.respond(f"Plugin ``{plugin_name}`` je obnoven!")
+            await self.bot.reload_extension(f"plugins.{plugin_name}.{plugin_name}")
+            await self._sync_commands()
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` successfully reloaded!"
+            )
         except discord.ExtensionNotFound:
-            await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` does not exist!", ephemeral=True
+            )
         except discord.ExtensionNotLoaded:
-            await ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
-        except discord.ExtensionFailed:
-            await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` is not currently loaded!", ephemeral=True
+            )
+        except discord.ExtensionFailed as e:
+            logger.error(f"Failed to reload {plugin_name}: {e}")
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` failed to load due to an error.",
+                ephemeral=True,
+            )
         except Exception as e:
-            await ctx.respond(
-                f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})"
+            logger.exception(f"Unexpected error reloading {plugin_name}")
+            await interaction.followup.send(
+                f"An unexpected error occurred: {e}", ephemeral=True
             )
 
-        await self.sync_commands_after_action()
-
-    # TODO dodělat choices
-    @commands.slash_command(
-        name="activate_plugin", description="Aktivuje zadaný plugin."
+    @app_commands.command(
+        name="activate_plugin", description="Activates (loads) a specified plugin."
     )
-    async def activate_plugin(self, ctx, plugin_name):
-        if not Permissions.has_permission("plugin_manager", ctx.author.id):
-            await ctx.send(ErrMesagges.BAD_PERMISSIONS)
+    @app_commands.autocomplete(plugin_name=plugin_autocomplete)
+    async def activate_plugin(
+        self, interaction: discord.Interaction, plugin_name: str
+    ) -> None:
+        """Loads a bot extension.
+
+        Args:
+            interaction (discord.Interaction): The interaction object.
+            plugin_name (str): The name of the plugin to load.
+        """
+        if not Permissions.has_permission("plugin_manager", interaction.user.id):
+            await interaction.response.send_message(
+                ErrMesagges.BAD_PERMISSIONS, ephemeral=True
+            )
             return
 
+        await interaction.response.defer()
+
         try:
-            self.bot.load_extension(f"plugins.{plugin_name}.{plugin_name}")
-            await ctx.respond(f"Plugin ``{plugin_name}`` je aktivován!")
+            await self.bot.load_extension(f"plugins.{plugin_name}.{plugin_name}")
+            await self._sync_commands()
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` successfully activated!"
+            )
         except discord.ExtensionNotFound:
-            await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` does not exist!", ephemeral=True
+            )
         except discord.ExtensionAlreadyLoaded:
-            await ctx.respond(f"Plugin ``{plugin_name}`` je již aktivován!")
-        except discord.ExtensionFailed:
-            await ctx.respond(f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu!")
-        except Exception as e:
-            await ctx.respond(
-                f"Plugin ``{plugin_name}`` nelze načíst, obsahuje chybu! ({e})"
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` is already active!", ephemeral=True
             )
-        await self.sync_commands_after_action()
+        except discord.ExtensionFailed as e:
+            logger.error(f"Failed to load {plugin_name}: {e}")
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` failed to load due to an error.",
+                ephemeral=True,
+            )
+        except Exception as e:
+            logger.exception(f"Unexpected error loading {plugin_name}")
+            await interaction.followup.send(
+                f"An unexpected error occurred: {e}", ephemeral=True
+            )
 
-    # TODO dodělat choices
-    @commands.slash_command(
-        name="deactivate_plugin", description="Deaktivuje zadaný plugin."
+    @app_commands.command(
+        name="deactivate_plugin", description="Deactivates (unloads) a specified plugin."
     )
-    async def deactivate_plugin(self, ctx, plugin_name):
-        if not Permissions.has_permission("plugin_manager", ctx.author.id):
-            await ctx.respond(ErrMesagges.BAD_PERMISSIONS)
+    @app_commands.autocomplete(plugin_name=plugin_autocomplete)
+    async def deactivate_plugin(
+        self, interaction: discord.Interaction, plugin_name: str
+    ) -> None:
+        """Unloads a bot extension.
+
+        Args:
+            interaction (discord.Interaction): The interaction object.
+            plugin_name (str): The name of the plugin to unload.
+        """
+        if not Permissions.has_permission("plugin_manager", interaction.user.id):
+            await interaction.response.send_message(
+                ErrMesagges.BAD_PERMISSIONS, ephemeral=True
+            )
             return
 
-        try:
-            self.bot.unload_extension(f"plugins.{plugin_name}.{plugin_name}")
-            await ctx.respond(f"Plugin ``{plugin_name}`` je deaktivován!")
-        except discord.ExtensionNotFound:
-            await ctx.respond(f"Plugin ``{plugin_name}`` neexistuje!")
-        except discord.ExtensionNotLoaded:
-            await ctx.respond(f"Plugin ``{plugin_name}`` není aktivován!")
-        except Exception as e:
-            await ctx.respond(
-                f"Plugin ``{plugin_name}`` nelze deaktivovat, obsahuje chybu! ({e})"
-            )
-        await self.sync_commands_after_action()
+        await interaction.response.defer()
 
-    @commands.slash_command(
-        name="show_all_plugins", description="Zobrazí názvy všech pluginů."
+        try:
+            await self.bot.unload_extension(f"plugins.{plugin_name}.{plugin_name}")
+            await self._sync_commands()
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` successfully deactivated!"
+            )
+        except discord.ExtensionNotFound:
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` does not exist!", ephemeral=True
+            )
+        except discord.ExtensionNotLoaded:
+            await interaction.followup.send(
+                f"Plugin ``{plugin_name}`` is not currently active!", ephemeral=True
+            )
+        except Exception as e:
+            logger.exception(f"Unexpected error unloading {plugin_name}")
+            await interaction.followup.send(
+                f"An unexpected error occurred: {e}", ephemeral=True
+            )
+
+    @app_commands.command(
+        name="show_all_plugins", description="Lists all available plugins."
     )
-    async def show_all_plugins(self, ctx):
-        await ctx.respond(all_plugins())
+    async def show_all_plugins(self, interaction: discord.Interaction) -> None:
+        """Displays a list of all plugins available in the system.
+
+        Args:
+            interaction (discord.Interaction): The interaction object.
+        """
+        plugins_list = all_plugins()
+        formatted_list = "\n".join(f"- {plugin}" for plugin in plugins_list)
+        await interaction.response.send_message(
+            f"**Available Plugins:**\n{formatted_list}"
+        )

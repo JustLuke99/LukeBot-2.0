@@ -14,8 +14,8 @@ from .constants import PARSER_DIRECTORY
 __version__ = "1.0"
 
 
-def setup(bot):
-    bot.add_cog(Lunch(bot))
+async def setup(bot):
+    await bot.add_cog(Lunch(bot))
 
 
 class Lunch(commands.Cog):
@@ -25,7 +25,8 @@ class Lunch(commands.Cog):
             x for x in config("LUNCH_ROOMS").replace(" ", "").split(",")
         ]
 
-        self.bg_task = self.bot.loop.create_task(self.auto_send_lunches())
+        if self.lunch_rooms:
+            self.bg_task = self.bot.loop.create_task(self.auto_send_lunches())
 
         print(f"Initializing lunch module (version {__version__})")
 

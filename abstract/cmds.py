@@ -4,7 +4,7 @@ from channels.db import database_sync_to_async
 from discord.ext import commands
 
 from data.models import RunningCommand
-from constants import PLUGIN_DIRECTORY
+from abstract.constants import PLUGIN_DIRECTORY
 
 
 def check_if_cmd_is_running(room_id: int, command_name: str):
@@ -41,7 +41,7 @@ def del_all_commands():
 
 
 def all_plugins():
-    path = os.path.join(os.path.dirname(__file__).rsplit("\\", 1)[0], PLUGIN_DIRECTORY)
+    path = os.path.join(os.path.dirname(__file__).rsplit("/", 1)[0], PLUGIN_DIRECTORY)
     files = os.listdir(path)
 
     plugins = []
