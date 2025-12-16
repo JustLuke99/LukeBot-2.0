@@ -15,7 +15,6 @@ ENV PYTHONUNBUFFERED=1
 # build-essential, gcc - pro kompilaci některých python knihoven
 # chromium, chromium-driver - pro Selenium
 RUN apt-get update && apt-get install -y \
-    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Zkopírujeme requirements a nainstalujeme závislosti
