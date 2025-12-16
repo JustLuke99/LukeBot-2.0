@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  bot:
+    build: .
+    container_name: lukebot
+    restart: always
+
+    env_file:
+      - .env
+
+    volumes:
+      - ./db.sqlite3:/app/db.sqlite3
