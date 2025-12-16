@@ -16,11 +16,6 @@ ENV PYTHONUNBUFFERED=1
 # chromium, chromium-driver - pro Selenium
 RUN apt-get update && apt-get install -y \
     ffmpeg \
-    build-essential \
-    libffi-dev \
-    gcc \
-    chromium \
-    chromium-driver \
     && rm -rf /var/lib/apt/lists/*
 
 # Zkopírujeme requirements a nainstalujeme závislosti
