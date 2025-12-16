@@ -1,5 +1,5 @@
 # Použijeme lehkou verzi Pythonu 3.11
-FROM python:3.11
+FROM python:3.13
 
 # Nastavení pracovního adresáře v kontejneru
 WORKDIR /app
