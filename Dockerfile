@@ -25,4 +25,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Příkaz, který se spustí při startu kontejneru
-CMD ["python", "main.py"]
+CMD ["sh", "-c", "python manage.py migrate && python main.py"]
