@@ -54,10 +54,15 @@ class RedditManager:
             images_data (List[dict]): A list of dictionaries containing 'url'
                 and 'subreddit'.
         """
+        from django.db import connection
+
         objects = [
             RedditImage(url=item["url"], subreddit=item["subreddit"])
             for item in images_data
         ]
+
+        connection.ensure_connection()
+
         RedditImage.objects.bulk_create(objects, ignore_conflicts=True)
 
     @sync_to_async
