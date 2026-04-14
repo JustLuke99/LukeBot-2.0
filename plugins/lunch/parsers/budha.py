@@ -1,21 +1,21 @@
 from datetime import datetime
-from typing import List, Dict
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
 
 
-def budha_parser() -> List[Dict]:
+def budha_parser() -> List[str]:
     url = "http://www.indian-restaurant-buddha.cz/"
 
     current_date = datetime.now().strftime("%d. %m.")
     if current_date[0] == "0":
         current_date = current_date[1:]
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        raise RuntimeError()
+        raise RuntimeError(f"budha vrátil status {response.status_code}")
 
     html_content = response.content.decode("utf-8")
     soup = BeautifulSoup(html_content, "html.parser")
@@ -30,3 +30,5 @@ def budha_parser() -> List[Dict]:
             ):
                 if next_element.name != "h2":
                     return next_element.text.strip().replace("\r\r", "").split("\n")
+
+    return []

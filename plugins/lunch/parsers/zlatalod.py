@@ -1,17 +1,16 @@
-from typing import List, Dict
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
-from datetime import datetime
 
 
-def zlatalod_parser() -> List[Dict]:
+def zlatalod_parser() -> List[str]:
     url = "https://www.zlatalod.com/menu/"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        raise RuntimeError()
+        raise RuntimeError(f"zlatalod vrátila status {response.status_code}")
 
     html_content = response.content.decode("utf-8")
     soup = BeautifulSoup(html_content, "html.parser")
@@ -40,7 +39,7 @@ def zlatalod_parser() -> List[Dict]:
                     if len(columns) > 1
                     else ""
                 )
-                if not f"{meal_name} {meal_price}" == " ":
+                if f"{meal_name} {meal_price}" != " ":
                     menus.append(f"{meal_name} {meal_price}")
 
     return menus

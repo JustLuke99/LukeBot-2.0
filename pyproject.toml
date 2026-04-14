@@ -1,0 +1,53 @@
+[project]
+name = "lukebot-2-0"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+    "py-cord>=2.6.0",
+    "django>=5.1",
+    "channels>=4.1",
+    "praw>=7.8",
+    "python-decouple>=3.8",
+    "aiohttp>=3.10",
+    "requests>=2.32",
+    "beautifulsoup4>=4.12",
+    "selenium>=4.25",
+    "pytz>=2024.1",
+    "giphy-client>=1.0.0",
+    "lxml>=5.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.9",
+    "pytest-asyncio>=0.24",
+    "pytest-mock>=3.14",
+    "black>=24.0",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "settings_test"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+pythonpath = ["."]
+# Async/transaction testy musí běžet na konci — přechod z transaction→non-transaction mode způsobuje hang
+testpaths = [
+    "tests/test_permissions.py",
+    "tests/test_plugin_loader.py",
+    "tests/test_models.py",
+    "tests/test_responses_utils.py",
+    "tests/test_lunch_parsers.py",
+    "tests/test_misc_utils.py",
+    "tests/test_db_helpers.py",
+    "tests/test_reddit_utils.py",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.9",
+    "pytest-asyncio>=0.24",
+    "pytest-mock>=3.14",
+    "black>=24.0",
+]

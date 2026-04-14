@@ -1,16 +1,16 @@
-from typing import List, Dict
+from typing import List
 
 import requests
 from bs4 import BeautifulSoup
 
 
-def knoflik_parser() -> List[Dict]:
+def knoflik_parser() -> List[str]:
     url = "http://brnorestaurace.cz/tydenni-menu/"
 
-    response = requests.get(url)
+    response = requests.get(url, timeout=10)
 
     if response.status_code != 200:
-        raise RuntimeError()
+        raise RuntimeError(f"knoflik vrátil status {response.status_code}")
 
     html_content = response.content.decode("utf-8")
     soup = BeautifulSoup(html_content, "html.parser")
